@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <cassert>
 #include "mathematicalFunction.hpp"
 #include "data.hpp"
 
@@ -11,7 +12,7 @@
 std::random_device RandomDevice;
 std::default_random_engine RandomEngine(RandomDevice());
 std::uniform_int_distribution<int>  idRange(0, 50000);
-std::uniform_int_distribution<int>  WeightIntialisation(-2, 2);
+std::uniform_real_distribution<>  WeightIntialisation(0, 1);
 
 
 class neuron
@@ -27,7 +28,7 @@ public:
 	{
 		
 		NeuronEnter.swap(Enter);
-		Enter.push_back(1);
+		Enter.push_back(1); // threshold 
 
 	}
 	void SetWeight()
@@ -35,12 +36,13 @@ public:
 
 		if (Weight.empty())  //for not erase good weight
 		{
-			for (auto i = 0; i <Enter.size(); i++)
+			for (auto i = 0; i <Enter.size()-1; i++)
 			{
 
 				Weight.push_back(WeightIntialisation(RandomEngine));
 
 			}
+			Weight.push_back(0); // threshold Weight
 
 
 		}
@@ -53,9 +55,10 @@ public:
 		if (Weight.size() != Enter.size())
 		{
 
-			std::cerr << "error Weight != Enter " << std::endl;
-			std::cerr << "Weight =" << Weight.size() << std::endl;
-			std::cerr << "Enter =" << Enter.size() << std::endl;
+			std::cerr << "error Weight size != Enter size " << std::endl;
+			std::cerr << "Weight size =" << Weight.size() << std::endl;
+			std::cerr << "Enter  size =" << Enter.size() << std::endl;
+			return 666;
 		}
 		
 		for (auto i = 0; i< Enter.size(); i++)
@@ -91,10 +94,13 @@ public:
 					Weight[0] = Weight[0] + (data[i].resultWould - output)*EnterForLearn[0];
 					Weight[1] = Weight[1] + (data[i].resultWould - output)*EnterForLearn[1];
 					Weight[2] = Weight[2] + (data[i].resultWould - output);
+					
+
 				}
 				EnterForLearn.clear();
 
 			}
+
 
 		}
 		
@@ -105,12 +111,7 @@ public:
 		
 	
 	}
-	void Connect( neuron neuron1 , neuron neuronToConnect)
-	{
 
-		neuronToConnect.Enter[0] = neuron1.exit;
-
-	}
 
 
 	int Id = idRange(RandomEngine);
@@ -119,14 +120,16 @@ public:
 
 
 
-
-
-private :
-
 	std::vector<double> Enter;
 	std::vector<double> Weight;
 	double exit;
+
+private :
+
+
+
 	int LearnIteration = 0;
 
 
 };
+
