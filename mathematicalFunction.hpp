@@ -30,10 +30,10 @@ int Heaviside(float x)// no idea of name
 
 
 
-float Sigmoide(float x)
+double Sigmoide(double x)
 {
-	float exp_value;
-	float return_value;
+	double exp_value;
+	double return_value;
 
 	exp_value = exp((double)-x);
 
