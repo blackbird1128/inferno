@@ -3,6 +3,7 @@
 #include <vector>
 #include <random>
 #include <cassert>
+#include <string> // for test only
 #include "mathematicalFunction.hpp"
 #include "data.hpp"
 
@@ -12,7 +13,7 @@
 std::random_device RandomDevice;
 std::default_random_engine RandomEngine(RandomDevice());
 std::uniform_int_distribution<int>  idRange(0, 50000);
-std::uniform_real_distribution<>  WeightIntialisation(0, 1);
+std::uniform_real_distribution<>  WeightIntialisation(-1, 1);
 
 
 class neuron
@@ -22,11 +23,11 @@ public:
 
 
 
-	
+
 
 	void SetEnter(std::vector<double> NeuronEnter)
 	{
-		
+
 		NeuronEnter.swap(Enter);
 		Enter.push_back(1); // threshold 
 
@@ -36,7 +37,7 @@ public:
 
 		if (Weight.empty())  //for not erase good weight
 		{
-			for (auto i = 0; i <Enter.size()-1; i++)
+			for (auto i = 0; i <Enter.size() - 1; i++)
 			{
 
 				Weight.push_back(WeightIntialisation(RandomEngine));
@@ -47,9 +48,10 @@ public:
 
 		}
 
-		
+
 	}
-	double Compute()
+	template<typename T>
+	double Compute(T ActivationFonction)
 	{
 		double weightedSum = 0;
 		if (Weight.size() != Enter.size())
@@ -60,41 +62,47 @@ public:
 			std::cerr << "Enter  size =" << Enter.size() << std::endl;
 			return 666;
 		}
-		
+
 		for (auto i = 0; i< Enter.size(); i++)
 		{
 			weightedSum = weightedSum + Enter[i] * Weight[i];
 
 		}
-		exit = Heaviside(weightedSum);
-		return exit;
-		
 	
+		exit = ActivationFonction(weightedSum);
+		return exit;
+
+
+
 	}
+
 
 
 	void Train(std::vector<DataForLearn_2> data)
 	{
 		std::vector<double> EnterForLearn;
-		
-		
-		for (unsigned int i = 0; i < 2000; i++)
+
+		double output = 0;
+		int test = 0;
+		for (unsigned int i = 0; i < 900; i++)
 		{
-			for (unsigned int i = 0; i < data.size() ; i++)
+			for (unsigned int i = 0; i < data.size(); i++)
 			{
 				EnterForLearn.push_back(data[i].firstEnter);
 				EnterForLearn.push_back(data[i].secondEnter);
-				this->SetEnter(EnterForLearn);				
+				this->SetEnter(EnterForLearn);
 				this->SetWeight();
-				double output = this->Compute();
+			
+				output = this->Compute(Heaviside);
 				if (output != data[i].resultWould)
 				{
-					
 
-					Weight[0] = Weight[0] + (data[i].resultWould - output)*EnterForLearn[0];
-					Weight[1] = Weight[1] + (data[i].resultWould - output)*EnterForLearn[1];
+
+					Weight[0] = Weight[0] + (data[i].resultWould - output)*EnterForLearn[0]*0.1;
+					Weight[1] = Weight[1] + (data[i].resultWould - output)*EnterForLearn[1]*0.1;
 					Weight[2] = Weight[2] + (data[i].resultWould - output);
-					
+					std::cout << "weight 1 :" << Weight[0] << std::endl;
+					std::cout << "weight 2 :" << Weight[1] << std::endl;
 
 				}
 				EnterForLearn.clear();
@@ -103,13 +111,13 @@ public:
 
 
 		}
-		
-
-		
 
 
-		
-	
+
+
+
+
+
 	}
 
 
@@ -119,12 +127,13 @@ public:
 
 
 
-
+	int ConnexionCount;
 	std::vector<double> Enter;
 	std::vector<double> Weight;
+	std::vector<neuron> ConnectedTo;
 	double exit;
 
-private :
+private:
 
 
 
@@ -132,4 +141,3 @@ private :
 
 
 };
-
