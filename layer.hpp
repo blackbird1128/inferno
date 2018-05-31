@@ -22,6 +22,33 @@ public:
 
 
 	}
+	Layer()
+	{
+
+
+
+	}
+	void AddNeuron()
+	{
+
+		neuron neuronOfLayer;
+		neuronLayer.push_back(neuronOfLayer);
+	}
+	void RemoveNeuron()
+	{
+		if (!neuronLayer.empty())
+		{
+			neuronLayer.pop_back();
+		}
+		else
+		{
+			std::cerr << "can't remove neuron , layer is empty " << std::endl;
+		}
+			
+
+	}
+
+
 
 	std::vector<neuron> neuronLayer;
 
