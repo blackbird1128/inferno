@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "neuronnalFunction.hpp"
+#include "layer.hpp"
 
 class NeuronalNetwork
 {
@@ -11,20 +12,14 @@ public:
 	
 		for (auto i = 0; i < enterLayerSize;i++)
 		{
-
-			std::cout << enterLayerSize << std::endl;
-			neuron enterNeuron;
-			enterLayer.push_back(enterNeuron);
+			enterLayer.AddNeuron();
+           
 		}
 
-		for (auto i = 0; i < numberOfLayer; i++)
+		for (auto j = 0; j < numberOfLayer; j++)
 		{
-			for (auto i = 0; i < layerSize; i++)
-			{
-				neuron  hiddenLayerNeuron;
-				hiddenLayer.push_back(hiddenLayerNeuron);
-
-			}
+			Layer  oneHiddenLayer(layerSize); //no idea of name 
+			hiddenLayer.push_back(oneHiddenLayer);
 
 
 		}
@@ -32,11 +27,16 @@ public:
 		for (auto i = 0; i < exitLayerSize; i++)
 		{
 			  
-			neuron exitNeuron;
-			exitLayer.push_back(exitNeuron);
+			exitLayer.AddNeuron();
 
 
 		}
+
+
+	}
+	float Compute()
+	{
+
 
 
 	}
@@ -45,12 +45,11 @@ public:
 
 
 
-
 private:
 
-	std::vector<neuron> enterLayer;
-	std::vector<neuron> hiddenLayer;
-	std::vector<neuron> exitLayer;
+	Layer enterLayer;
+	std::vector<Layer> hiddenLayer; 
+	Layer exitLayer;
 
 
 };
