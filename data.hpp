@@ -26,6 +26,7 @@ struct DataForLearn_2
 struct DataForLearn_n
 {
 	std::vector<double> Enter;
+	std::vector<double> Exit;
 	double resultWould;
 
 };
