@@ -4,9 +4,19 @@
 
 
 
+std::random_device randomDevice;
+std::default_random_engine randomEngine; 
+std::uniform_real_distribution<> weightGenerator(-1, 1);
+
+
+
+
 
 class Layer
 {
+
+
+
 
 public:
 
@@ -50,11 +60,15 @@ public:
 	template<typename T>
 	void Compute(T ActivationFunction)
 	{
+
+		
 		for (auto i = 0; i < neuronLayer.size(); i++)
 		{
 
 
 			auto result = neuronLayer[i].Compute(ActivationFunction);
+			std::cout << "neuron layer[i] compute " << result << std::endl;
+			std::cout << "weight :" << neuronLayer[i].Weight[0] << std::endl;
 			exit.push_back(result);
 		}
 
@@ -68,7 +82,10 @@ public:
 			{
 
 				neuronLayer[i].Enter.push_back(previousLayer.exit[j]);
-				neuronLayer[i].SetWeight();
+				enter.push_back(previousLayer.exit[j]);
+				neuronLayer[i].Weight.push_back(weightGenerator(randomEngine));
+	            
+			//	neuronLayer[i].SetWeight(2);
 			}
            
 
@@ -88,8 +105,14 @@ public:
 		{
 
 			neuronLayer[i].Enter.push_back(EntertoSet[i]);
-			neuronLayer[i].SetWeight();
+			enter.push_back(EntertoSet[i]);
+	
+
+			
 		}
+
+
+
 
 			
 	
