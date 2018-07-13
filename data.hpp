@@ -26,8 +26,11 @@ struct DataForLearn_2
 
 struct DataForLearn_n
 {
+
 	std::vector<float> Enter;
 	std::vector<float> ExitExpected;
+
+
 	double resultWould;
 
 };
