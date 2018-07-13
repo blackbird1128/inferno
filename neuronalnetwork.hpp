@@ -2,8 +2,11 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <chrono>
 #include "neuronnalFunction.hpp"
 #include "layer.hpp"
+
+
 
 
 class NeuronalNetwork
@@ -36,36 +39,96 @@ public:
 
 
 	}
-	float Compute()
+
+	void SetEnter(std::vector<float > enter)
 	{
-		std::vector<float> bla{ 2,3 };
-		enterLayer.SetEnter(bla);
-		std::cout << " enter layer enter size :" << enterLayer.enter.size() << std::endl;
-		for(auto i = 0; i < enterLayer.enter.size();i++)
+
+		enterLayer.SetEnter(enter);
+	}
+
+	void SoftReset()
+	{
+		for (auto i = 0; i < enterLayer.neuronLayer.size(); i++)
 		{
-			enterLayer.exit.push_back(Sigmoid(enterLayer.enter[i]));
+			enterLayer.neuronLayer[i].Enter.clear();
+			enterLayer.neuronLayer[i].exit = 0;
+			enterLayer.enter.clear();
+			enterLayer.exit.clear();
+			enterLayer.Deltas.clear();
+			enterLayer.Error.clear();
+			
+
+
+
 		}
-		std::cout <<  "enter exit size" << enterLayer.exit.size() << std::endl;
-		hiddenLayer[0].SetEnter(enterLayer);
-		hiddenLayer[0].Compute(Sigmoid);
-
-		
-		for (auto i = 1; i < hiddenLayer.size()-1;i++)
+		for (auto i = 0; i < hiddenLayer.size(); i++)
 		{
+			for (auto j = 0; j < hiddenLayer[i].neuronLayer.size(); j++)
+			{
+				hiddenLayer[i].neuronLayer[j].Enter.clear();
+				hiddenLayer[i].neuronLayer[j].exit = 0;
+				hiddenLayer[i].enter.clear();
+				hiddenLayer[i].exit.clear();
+				hiddenLayer[i].Deltas.clear();
+				hiddenLayer[i].Error.clear();
 
-			if (i + 1 > hiddenLayer.size() - 1) { break; }
-			hiddenLayer[i + 1].SetEnter(hiddenLayer[i]);
-			hiddenLayer[i].Compute(Sigmoid);
+
+			}
+			
 			
 
 		}
-		exitLayer.SetEnter(hiddenLayer[hiddenLayer.size()-1]); // because vector index begin at 0 
-		exitLayer.Compute(Sigmoid);
+		for (auto i = 0; i < exitLayer.neuronLayer.size(); i++)
+		{
+			exitLayer.neuronLayer[i].Enter.clear();
+			exitLayer.neuronLayer[i].exit = 0;
+			exitLayer.enter.clear();
+			exitLayer.exit.clear();
+			exitLayer.Deltas.clear();
+			exitLayer.Error.clear();
+
+
+		}
+
+	}
+
+	float Compute()
+	{
+
+		
+		for(auto i = 0; i < enterLayer.enter.size();i++)
+		{
+			this->enterLayer.exit.push_back(enterLayer.enter[i]);
+		}
+
+		this->hiddenLayer[0].SetEnter(enterLayer);
+
+
+		
+		for (auto i = 0; i < hiddenLayer.size()-1;i++)
+		{
+
+			this->hiddenLayer[i].Compute(Sigmoid);
+			this->hiddenLayer[i + 1].SetEnter(hiddenLayer[i]);
+			
+			
+
+		}
+		this->hiddenLayer[hiddenLayer.size() - 1].Compute(Sigmoid);
+		this->exitLayer.SetEnter(hiddenLayer[hiddenLayer.size()-1]); // because vector index begin at 0 
+		this->exitLayer.Compute(Sigmoid);
+
+
+		
 
 		return 0;
 
 	}
-	float BackPropagation(DataForLearn_n target , float learningRate , float momentumFactor)
+
+
+
+
+	float BackPropagation(DataForLearn_n& target , float learningRate , float momentumFactor)
 	{
 		if(target.ExitExpected.size()!= exitLayer.exit.size())
 		{
@@ -73,124 +136,79 @@ public:
 
 		
 		}
-		std::vector<float> output_deltas;
-		for (auto i : exitLayer.exit)
-		{
-			float error = 0;
-			error = target.ExitExpected[i] - i;
-			output_deltas.push_back(error);
 
-		}
-		std::vector<float> hidden_deltas;
+
+
+		exitLayer.ComputeDelta(target.ExitExpected);
+      
 		std::reverse(hiddenLayer.begin(), hiddenLayer.end());
-		for (auto j = 0 ; j < hiddenLayer[0].neuronLayer.size();j++)
+		hiddenLayer[0].ComputeDelta(exitLayer);
+		
+
+
+		for (auto i = 1; i < hiddenLayer.size(); i++)
 		{
-			auto currentLayerExit = hiddenLayer[0].neuronLayer[j].exit;
-			auto currentLayerWeight = hiddenLayer[0].neuronLayer[j].Weight;
-			auto Delta = currentLayerExit * (1 - currentLayerExit);
-			float sumOfPonderedDelta = 0;
-			for (auto i = 0; i < exitLayer.neuronLayer.size(); i++)
-			{
-				  
-				sumOfPonderedDelta += currentLayerWeight[j] * output_deltas[i];
-
-			}
-			Delta += sumOfPonderedDelta;
-			hidden_deltas.push_back(Delta);
-
-
+			 hiddenLayer[i].ComputeDelta(hiddenLayer[i -1 ]);
 
 
 		}
-		for(auto i = 1 ;i < hiddenLayer.size();i++ )
+		exitLayer.updateWeight(learningRate);
+		for (auto i = 0; i < hiddenLayer.size(); i++)
 		{
 
-			for (auto j = 0; j < hiddenLayer[i].neuronLayer.size(); i++)
-			{
-				auto currentLayerExit = hiddenLayer[i].neuronLayer[j].exit;
-				auto currentLayerWeight = hiddenLayer[i].neuronLayer[j].Weight;
-				auto Delta = currentLayerExit * (1 - currentLayerExit);
-				float sumOfPonderedDelta = 0;
-				for (auto b = 0; b < exitLayer.neuronLayer.size(); b++)
-				{
-
-					sumOfPonderedDelta += currentLayerWeight[j] * output_deltas[b];
-
-				}
-				Delta += sumOfPonderedDelta;
-				hidden_deltas.push_back(Delta);
-
-
-			}		
-		}
-
-
-
-
-		for (auto i = 0; i < exitLayer.neuronLayer.size(); i++)
-		{
-
-			for (auto j = 0; j < exitLayer.neuronLayer[i].Weight.size();j++)
-			{
-				auto actualWeight = exitLayer.neuronLayer[i].Weight[j];
-				exitLayer.neuronLayer[i].Weight[j] = actualWeight + learningRate * hiddenLayer[0].neuronLayer[j].exit * output_deltas[j];
-
-
-			}
-
+			hiddenLayer[i].updateWeight(learningRate);
 
 		}
-		std::reverse(hidden_deltas.begin(), hidden_deltas.end());
-		for (auto d = 0; d < hiddenLayer.size(); d++)
-		{
-
-			for (auto k = 0; k < hiddenLayer[d].neuronLayer.size()-1; k++)
-			{
-				for (auto j = 0; j < hiddenLayer[d].neuronLayer[k].Weight.size();j++)
-				{
-					auto actualWeight = hiddenLayer[d].neuronLayer[k].Weight[j];
-					auto actualEnter = hiddenLayer[d].neuronLayer[k].Enter[j];
-					hiddenLayer[d].neuronLayer[k].Weight[j] = actualWeight + learningRate * actualEnter * hidden_deltas[(1*d+1*k+1)-1] ;
-
-
-				}
-
-
-
-
-			}
-
-
-
-		}
-
-
-
-
-
-
-
 
 
 		std::reverse(hiddenLayer.begin(), hiddenLayer.end());
-		std::reverse(hidden_deltas.begin(), hidden_deltas.end());
-
-
-          
-
-
 
 	}
 
 
+	void  Train(Dataset& dataset, float learningRate, float momentumFactor , float learningIteration)
+	{
 
 
+
+
+		for (auto i = 0; i < learningIteration; i++)
+		{
+
+			
+			for (auto i = 0; i < dataset.dataset.size(); i++)
+			{
+			
+
+				this->SetEnter(dataset.dataset[i].Enter);
+				this->Compute();
+				this->BackPropagation(dataset.dataset[i], learningRate, momentumFactor);
+				this->SoftReset();
+
+			}
+
+		}
+		/*   
+
+		this->SetEnter(std::vector<float>{0.8f , 0.8f });
+		this->Compute();
+		std::cout << "resultat :" << exitLayer.neuronLayer[0].exit << std::endl;
+		this->SoftReset();
+		this->SetEnter(std::vector<float>{0.2f, 0.8f});
+		this->Compute();
+		std::cout << "resultat :" << exitLayer.neuronLayer[0].exit << std::endl;
+		*/
+	}
+
+
+
+	Layer enterLayer;
+	std::vector<Layer> hiddenLayer;
+	Layer exitLayer;
 	float exit;
 private:
 
-	Layer enterLayer;
-	std::vector<Layer> hiddenLayer; 
-	Layer exitLayer;
+
     
 
 };

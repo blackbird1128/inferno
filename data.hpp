@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <string>
 
 
 struct DataForLearn_1
@@ -25,8 +26,17 @@ struct DataForLearn_2
 
 struct DataForLearn_n
 {
-	std::vector<double> Enter;
-	std::vector<double> ExitExpected;
+	std::vector<float> Enter;
+	std::vector<float> ExitExpected;
 	double resultWould;
 
+};
+
+
+struct Dataset
+{
+	std::vector<DataForLearn_n>  dataset;
+
+
+	
 };

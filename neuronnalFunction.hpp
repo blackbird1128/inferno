@@ -10,10 +10,11 @@
 
 
 
+
 std::random_device RandomDevice;
 std::default_random_engine RandomEngine(RandomDevice());
 std::uniform_int_distribution<int>  idRange(0, 50000);
-std::uniform_real_distribution<>  WeightIntialisation(-1, 1);
+std::uniform_real_distribution<>  WeightIntialisation(-4, 4);
 
 
 class neuron
@@ -37,7 +38,7 @@ public:
 
 		if (Weight.empty())  //for not erase good weight
 		{
-			for (auto i = 0; i <Enter.size() - 1; i++)
+			for (auto i = 0; i <Enter.size() -1; i++)
 			{
 
 				Weight.push_back(WeightIntialisation(RandomEngine));
@@ -50,6 +51,7 @@ public:
 
 
 	}
+
 	template<typename T>
 	double Compute(T ActivationFonction)
 	{
@@ -69,9 +71,10 @@ public:
 
 		}
 	
+	
 		exit = ActivationFonction(weightedSum);
 		return exit;
-
+		
 
 
 	}
@@ -127,10 +130,9 @@ public:
 
 
 
-	int ConnexionCount;
+
 	std::vector<double> Enter;
 	std::vector<double> Weight;
-	std::vector<neuron> ConnectedTo;
 	double exit;
 
 private:
