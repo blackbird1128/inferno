@@ -64,10 +64,8 @@ public:
         output = this->Compute(Heaviside);
         if (output != data[i].resultWould) {
 
-          Weight[0] = Weight[0] +
-                      (data[i].resultWould - output) * EnterForLearn[0] * 0.1;
-          Weight[1] = Weight[1] +
-                      (data[i].resultWould - output) * EnterForLearn[1] * 0.1;
+          Weight[0] = Weight[0] + (data[i].resultWould - output) * EnterForLearn[0] * 0.1;
+          Weight[1] = Weight[1] + (data[i].resultWould - output) * EnterForLearn[1] * 0.1;
           Weight[2] = Weight[2] + (data[i].resultWould - output);
           std::cout << "weight 1 :" << Weight[0] << std::endl;
           std::cout << "weight 2 :" << Weight[1] << std::endl;

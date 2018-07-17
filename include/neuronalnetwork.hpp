@@ -11,8 +11,7 @@ class NeuronalNetwork {
 public:
 
 
-  NeuronalNetwork(int enterLayerSize, int layerSize, int numberOfLayer,
-                  int exitLayerSize) {
+  NeuronalNetwork(int enterLayerSize, int layerSize, int numberOfLayer,  int exitLayerSize) {
 
     for (auto i = 0; i < enterLayerSize; i++) {
       enterLayer.AddNeuron();
@@ -77,20 +76,19 @@ public:
       this->hiddenLayer[i + 1].SetEnter(hiddenLayer[i]);
     }
     this->hiddenLayer[hiddenLayer.size() - 1].Compute(Sigmoid);
-    this->exitLayer.SetEnter(
-        hiddenLayer[hiddenLayer.size() - 1]); // because vector index begin at 0
+    this->exitLayer.SetEnter( hiddenLayer[hiddenLayer.size() - 1]); // because vector index begin at 0
     this->exitLayer.Compute(Sigmoid);
 
     return 0;
   }
 
   float BackPropagation(DataForLearn_n &target, float learningRate) {
-    if (target.ExitExpected.size() != exitLayer.exit.size()) {
+    if (target.exitExpected.size() != exitLayer.exit.size()) {
       throw std::length_error(std::string(
           "Exit layer  as not the same size than than target data  "));
     }
 
-    exitLayer.ComputeDelta(target.ExitExpected);
+    exitLayer.ComputeDelta(target.exitExpected);
 
     std::reverse(hiddenLayer.begin(), hiddenLayer.end());
     hiddenLayer[0].ComputeDelta(exitLayer);
