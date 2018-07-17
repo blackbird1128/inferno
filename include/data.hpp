@@ -1,45 +1,26 @@
 #pragma once
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
-
-struct DataForLearn_1
-{
-	double enter;
-	double resultWould;
-
-
-
+struct DataForLearn_1 {
+  double enter;
+  double resultWould;
 };
 
-
-struct DataForLearn_2
-{
-	float firstEnter;
-	float secondEnter;
-
-	float resultWould;
-
-
+struct DataForLearn_2 {
+  float firstEnter;
+  float secondEnter;
+  float resultWould;
 };
 
-struct DataForLearn_n
-{
+struct DataForLearn_n {
+  std::vector<float> Enter;
+  std::vector<float> ExitExpected;
 
-	std::vector<float> Enter;
-	std::vector<float> ExitExpected;
-
-
-	double resultWould;
-
+  double resultWould;
 };
 
-
-struct Dataset
-{
-	std::vector<DataForLearn_n>  dataset;
-
-
-	
+struct Dataset {
+  std::vector<DataForLearn_n> dataset;
 };
