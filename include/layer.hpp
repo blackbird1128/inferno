@@ -69,8 +69,8 @@ public:
     }
   }
 
-  template <typename T> void Compute(T ActivationFunction) {
-
+  void Compute(std::function<float(float)> functionToUse) {
+	  ActivationFunction = functionToUse;
     for (auto i = 0; i < neuronLayer.size(); i++) {
       auto result = neuronLayer[i].Compute(ActivationFunction);
       exit.push_back(result);
@@ -103,6 +103,7 @@ public:
     }
   }
 
+  std::function<float(float)> ActivationFunction;
   std::vector<neuron> neuronLayer;
   std::vector<float> Error;
   std::vector<float> Deltas;

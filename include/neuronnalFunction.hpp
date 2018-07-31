@@ -6,17 +6,18 @@
 #include <random>
 #include <string> // for test only
 #include <vector>
+#include <functional>
 
 std::random_device RandomDevice;
 std::default_random_engine RandomEngine(RandomDevice());
 std::uniform_int_distribution<int> idRange(0, 50000);
-std::uniform_real_distribution<> WeightIntialisation(-4, 4);
+std::uniform_real_distribution<> WeightIntialisation(-3, 3);
 
 class neuron {
 public:
-  void SetEnter(std::vector<double> NeuronEnter) {
+  void SetEnter(std::vector<double> neuronEnter) {
 
-    NeuronEnter.swap(Enter);
+    neuronEnter.swap(Enter);
     Enter.push_back(1); // threshold
   }
   void SetWeight() {
@@ -31,8 +32,9 @@ public:
     }
   }
 
-  template <typename T> double Compute(T ActivationFonction) {
+   double Compute(std::function<float(float)> functionToUse) {
     double weightedSum = 0;
+	activationFunction = functionToUse;
     if (Weight.size() != Enter.size()) {
 
       std::cerr << "error Weight size != Enter size " << std::endl;
@@ -45,7 +47,7 @@ public:
       weightedSum = weightedSum + Enter[i] * Weight[i];
     }
 
-    exit = ActivationFonction(weightedSum);
+    exit = activationFunction(weightedSum);
     return exit;
   }
 
@@ -76,7 +78,7 @@ public:
   }
 
   int Id = idRange(RandomEngine);
-
+  std::function<float(float)> activationFunction;
   std::vector<double> Enter;
   std::vector<double> Weight;
   double exit;

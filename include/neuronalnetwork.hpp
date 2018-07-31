@@ -5,14 +5,16 @@
 #include <chrono>
 #include <iostream>
 #include <vector>
+#include <functional>
 
 class NeuronalNetwork {
 
 public:
 
+ 
+  NeuronalNetwork(int enterLayerSize, int layerSize, int numberOfLayer,  int exitLayerSize , std::function<float(float)> functionToUse) {
 
-  NeuronalNetwork(int enterLayerSize, int layerSize, int numberOfLayer,  int exitLayerSize) {
-
+	  activationFunction = functionToUse;
     for (auto i = 0; i < enterLayerSize; i++) {
       enterLayer.AddNeuron();
     }
@@ -62,7 +64,8 @@ public:
     }
   }
 
-  float Compute() {
+  
+  float Compute() {  // set the activation Fonction used in the network
 
     for (auto i = 0; i < enterLayer.enter.size(); i++) {
       this->enterLayer.exit.push_back(enterLayer.enter[i]);
@@ -72,12 +75,12 @@ public:
 
     for (auto i = 0; i < hiddenLayer.size() - 1; i++) {
 
-      this->hiddenLayer[i].Compute(Sigmoid);
+      this->hiddenLayer[i].Compute(activationFunction);
       this->hiddenLayer[i + 1].SetEnter(hiddenLayer[i]);
     }
     this->hiddenLayer[hiddenLayer.size() - 1].Compute(Sigmoid);
     this->exitLayer.SetEnter( hiddenLayer[hiddenLayer.size() - 1]); // because vector index begin at 0
-    this->exitLayer.Compute(Sigmoid);
+    this->exitLayer.Compute(activationFunction);
 
     return 0;
   }
@@ -105,7 +108,7 @@ public:
     std::reverse(hiddenLayer.begin(), hiddenLayer.end());
   }
 
-  void Train(Dataset &dataset, float learningRate, float learningIteration) {
+  void Train(Dataset &dataset, float learningRate, float learningIteration ) {
 
     for (auto i = 0; i < learningIteration; i++) {
 
@@ -117,8 +120,18 @@ public:
         this->SoftReset();
       }
     }
+	this->SetEnter(std::vector<float>{0.2f, 0.8f});
+	this->Compute();
+	std::cout << this->exitLayer.neuronLayer[0].exit << std::endl;
+
+  }
+  void testFunc()
+  {
+	  activationFunction = ReLU;
+	  std::cout << activationFunction(55) << std::endl;;
   }
 
+  std::function<float(float)> activationFunction;
   Layer enterLayer;
   std::vector<Layer> hiddenLayer;
   Layer exitLayer;
