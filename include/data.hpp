@@ -19,6 +19,15 @@ struct DataForLearn_n {
   std::vector<float> exitExpected;
 
   double resultWould;
+
+  void clear()
+  {
+	  Enter.clear();
+	  exitExpected.clear();
+	  resultWould = 0;
+
+  }
+
 };
 
 struct Dataset {
