@@ -39,9 +39,10 @@ public:
     }
     for (auto i = 0; i < neuronLayer.size(); i++) {
 
-      Deltas.push_back(Error[i] * SigmoidPrime(neuronLayer[i].exit));
+      Deltas.push_back(Error[i] * n_SigmoidPrime(neuronLayer[i].enterSum));
     }
   }
+  
 
   void ComputeDelta(Layer previousLayer) {
 
@@ -64,15 +65,17 @@ public:
     for (auto i = 0; i < neuronLayer.size(); i++) {
       for (auto w = 0; w < neuronLayer[i].Weight.size(); w++)
 	  {
-        neuronLayer[i].Weight[w] =neuronLayer[i].Weight[w] + (learningRate * Deltas[i] * neuronLayer[i].Enter[w]);
+        neuronLayer[i].Weight[w] += (learningRate * Deltas[i] * neuronLayer[i].Enter[w]);
       }
     }
   }
 
   void Compute(std::function<float(float)> functionToUse) {
-	  ActivationFunction = functionToUse;
-    for (auto i = 0; i < neuronLayer.size(); i++) {
-      auto result = neuronLayer[i].Compute(ActivationFunction);
+	ActivationFunction = functionToUse;
+
+    for (auto i = 0; i < neuronLayer.size(); i++)
+	{
+      float result = neuronLayer[i].Compute(ActivationFunction);
       exit.push_back(result);
     }
   }
@@ -82,7 +85,9 @@ public:
       for (auto i = 0; i < neuronLayer.size(); i++) {
 
         neuronLayer[i].Enter.push_back(previousLayer.exit[j]);
+		neuronLayer[i].enterSum += previousLayer.exit[j]; // necessary for using any derivative function 
         enter.push_back(previousLayer.exit[j]);
+		enterSum += previousLayer.exit[j];
 
         if (neuronLayer[i].Weight.size() < neuronLayer[i].Enter.size()) {
           neuronLayer[i].Weight.push_back(WeightIntialisation(RandomEngine));
@@ -96,9 +101,11 @@ public:
     if (EntertoSet.size() != neuronLayer.size()) {
       throw std::string{"Enter size != neuronLayer size "};
     }
-    for (auto i = 0; i < EntertoSet.size(); i++) {
-
+    for (auto i = 0; i < EntertoSet.size(); i++) 
+	{
+	  enterSum += EntertoSet[i];
       neuronLayer[i].Enter.push_back(EntertoSet[i]);
+	  neuronLayer[i].enterSum += EntertoSet[i];
       enter.push_back(EntertoSet[i]);
     }
   }
@@ -109,4 +116,5 @@ public:
   std::vector<float> Deltas;
   std::vector<float> exit;
   std::vector<float> enter;
+  float enterSum = 0; //unused 
 };
