@@ -1,5 +1,5 @@
 # inferno
-Inferno is an c++ library created to help the begginers in machine learning by allowing to create in few line on code an functionnal
+Inferno is an c++ library created to help the begginers in machine learning by allowing to create in few lines of code an functionnal
 artifical neuron network 
 
 ## **functionalities :**
@@ -11,4 +11,4 @@ artifical neuron network
 
 ### notes:
 inferno is an library in constant developpement but in the beggining of is life.
-If you have any suggests fell free to make and pull request .
+If you have any suggests fell free to make an pull request .
