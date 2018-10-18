@@ -1,6 +1,6 @@
 #pragma once
 #include "layer.hpp"
-#include "neuronnalFunction.hpp"
+#include "neuronalFunction.hpp"
 #include <algorithm>
 #include <chrono>
 #include <vector>
@@ -11,7 +11,7 @@ class NeuronalNetwork {
 public:
 
  
-  NeuronalNetwork(int enterLayerSize, int layerSize, int numberOfLayer,  int exitLayerSize , std::function<float(float)> functionToUse) {
+  NeuronalNetwork(int enterLayerSize, int layerSize, int numberOfLayer,  int exitLayerSize , std::function<float(float)> functionToUse = Sigmoid) {
 
 	activationFunction = functionToUse;
     for (auto i = 0; i < enterLayerSize; i++)
@@ -71,7 +71,7 @@ public:
   }
 
   
-  float Compute() {
+   float Compute() {
 
     for (auto i = 0; i < enterLayer.enter.size(); i++)
 	{
@@ -92,7 +92,7 @@ public:
     return 0;
   }
 
-  float BackPropagation(DataForLearn_n &target, float learningRate) {
+  void BackPropagation(DataForLearn_n &target, float learningRate) {
     if (target.exitExpected.size() != exitLayer.exit.size()) {
       throw std::length_error(std::string("Exit layer  as not the same size than than target data"));
     }
@@ -131,9 +131,27 @@ public:
 
   }
 
+  std::vector<float> GetExit()
+  {
+
+	  std::vector<float > valueReturn;
+	  for (auto i = 0; i < exitLayer.neuronLayer.size(); i++)
+	  {
+
+		  valueReturn.push_back(exitLayer.neuronLayer[i].exit);
+	  }
+
+	  return valueReturn;
+  }
+
+
+
+
+
   std::function<float(float)> activationFunction;
   Layer enterLayer;
   std::vector<Layer> hiddenLayer;
   Layer exitLayer;
   float exit;
+
 };
