@@ -1,220 +1,218 @@
 #pragma once
 // must be herit of an generic layer class later
-#include <iostream>
-#include <fstream>
 #include "include/data.hpp"
+#include <fstream>
+#include <iostream>
 #include <stdexcept>
+#include <cmath>
 
 
-class CSVparserLayer
+
+namespace Inf
 {
-public:
+	class CSVparser {
+	public:
+		CSVparser() {}
 
-	CSVparserLayer(){}
-
-	CSVparserLayer(std::string filename)
-	{
-		csvReader.open(filename);
-	}
-
-	bool open(std::string filename)
-	{
-		csvReader.open(filename);
-		return true;
-	}
-	Dataset toDataset() // bad name to change 
-	{
-	
-
-		parseHeader();
-		std::string line;
-		while (parseLines(line) == true)
+		CSVparser(std::string filename)
 		{
-
+			csvReader.open(filename);
 		}
 
-		return csvDataset;
-
-	}
-
-	int getCollumnsNumber()
-	{
-		return header.size();
-	}
-
-	void setDefaultValue(double value)
-	{
-		defaultValue = value;
-	}
-	void setOutputCollumns(std::vector<int> outputIndex)
-	{
-		exitIndex = outputIndex;
-		std::sort(exitIndex.begin(), exitIndex.end());
-
-
-	}
-
-
-
-private:
-
-	void parseHeader()
-	{
-		if (csvReader.is_open())
+		bool open(std::string filename)
 		{
-			header.push_back("");
-			char c = ' ';
-			int i = 0;
-			while (c != '\n')
-			{
-				
-				bool onComma = false;
-				csvReader.get(c);
-				if (c == ',')
-				{
-					++i;
-					onComma = true;
-					header.push_back("");
-					std::cout << std::endl;
+			csvReader.open(filename);
+			return true;
+		}
+		Dataset toDataset() // bad name to change
+		{
 
-				}
-				if (onComma == false)
-				{
-					std::cout << c;
-					header[i] += c;
-				}
-
+			parseHeader();
+			std::string line;
+			while (parseLines(line) == true) {
 			}
-		}
-		else
-		{
-			throw std::invalid_argument("you must open a file for parse it ");
+
+			return csvDataset;
 		}
 
-	}
-
-	bool parseLines(std::string line)
-	{
-		char comma = ',';
-		char endline = '\n';
-		std::vector<std::string> lines;
-		std::cout << line << std::endl;
-		if (csvReader.is_open())
+		std::size_t getCollumnsNumber()
 		{
-			lines.push_back("");
-			char c = ' ';
-			int i = 0;
-			while (c != '\n')
+			return header.size();
+		}
+
+		void setDefaultValue(float value)
+		{
+			defaultValue = value;
+		}
+
+		void dropEmptyValue()
+		{
+			keepEmptyValue = false;
+		}
+
+		void setOutputCollumns(std::vector<int> outputIndex)
+		{
+			exitIndex = outputIndex;
+			std::sort(exitIndex.begin(), exitIndex.end());
+		}
+
+	private:
+		void parseHeader()
+		{
+			if (csvReader.is_open())
 			{
-				if (c == EOF)
+
+				header.push_back("");
+				char c = ' ';
+				int i = 0;
+				while (c != '\n')
 				{
-					return false;
+
+					bool onComma = false;
+					csvReader.get(c);
+					if (c == ',')
+					{
+						++i;
+						onComma = true;
+						header.push_back("");
+
+					}
+					if (onComma == false)
+					{
+						// std::cout << c;
+						header[i] += c;
+					}
 
 				}
-
-				bool onComma = false;
-				csvReader.get(c);
-				if (c == ',')
-				{
-					++i;
-					onComma = true;
-					lines.push_back("");
-					std::cout << std::endl;
-
-				}
-				if (onComma == false)
-				{
-					std::cout << c;
-					lines[i] += c;
-				}
-				if (lines[i] == "<EOF>") // manualy added for this moment 
-				{
-					csvReader.close();
-					return false;
-				}
-
-			}
-		}
-		else
-		{
-			throw std::invalid_argument("you must open a file for parse it ");
-		}
-
-		auto j = 0;
-		for (auto i = 0 ; i < lines.size();i++)
-		{
-			if (i == exitIndex[j])
-			{
-				try
-				{
-					linesData.exitExpected.push_back(std::stof(lines[i]));
-					j++;
-				}
-				catch(std::invalid_argument)
-				{
-					linesData.clear();
-					j = 0;
-					keepData = false;
-					break;
-				//	linesData.exitExpected.push_back(defaultValue);
-				}
-				
 
 			}
 			else
 			{
-
-				try
-				{
-					linesData.Enter.push_back(std::stof(lines[i]));
-				}
-				catch (std::invalid_argument )
-				{
-					linesData.clear();
-					j = 0;
-					keepData = false;
-					break;
-					// linesData.Enter.push_back(defaultValue);
-
-				}
-				
+				throw std::invalid_argument("you must open a file for parse it ");
 			}
 		}
-		j = 0;
 
-		if (keepData == true)
+		bool parseLines(std::string line)
 		{
-			csvDataset.dataset.push_back(linesData);
-			linesData.clear();
+			char comma = ',';
+			char endline = '\n';
+			std::vector<std::string> lines;
+			if (csvReader.is_open())
+			{
+				lines.push_back("");
+				char c = ' ';
+				int i = 0;
+				while (c != '\n')
+				{
+					if (c == EOF)
+					{
+						return false;
+					}
 
+					bool onComma = false;
+					csvReader.get(c);
+					if (c == ',')
+					{
+						++i;
+						onComma = true;
+						lines.push_back("");
+					}
+
+					if (onComma == false)
+					{
+						lines[i] += c;
+					}
+
+					if (csvReader.eof()) // manualy added for this moment
+					{
+						csvReader.close();
+						return false;
+					}
+				}
+			}
+			else
+			{
+				throw std::invalid_argument("you must open a file for parse it ");
+			}
+
+			auto j = 0;
+			for (auto i = 0; i < lines.size(); i++)
+			{
+				if (i == exitIndex[j])
+				{
+					try {
+						linesData.exitExpected.push_back(std::stof(lines[i]));
+						j++;
+					}
+					catch (std::invalid_argument)
+					{
+						if (keepEmptyValue == false)
+						{
+							linesData.clear();
+							j = 0;
+							keepData = false;
+							break;
+
+						}
+						else
+						{
+							linesData.exitExpected.push_back(defaultValue);
+
+						}
+					}
+
+				}
+				else
+				{
+
+					try
+					{
+						linesData.Enter.push_back(std::stof(lines[i]));
+					}
+					catch (std::invalid_argument)
+					{
+						if (keepEmptyValue == false)
+						{
+							linesData.clear();
+							j = 0;
+							keepData = false;
+							break;
+						}
+						else
+						{
+							// linesData.Enter.push_back(defaultValue);
+
+						}
+
+					}
+				}
+			}
+			j = 0;
+
+			if (keepData == true)
+			{
+				csvDataset.dataset.push_back(linesData);
+				linesData.clear();
+
+			}
+			else
+			{
+				keepData = true; // reset states
+			}
+
+			return true;
 		}
-		else
-		{
-			keepData = true; // reset states 
-		}
-	
-
-		return true;
 
 
 
-
-
-
-	}
-
-
-
-	float defaultValue = 0;
-	std::vector<int> exitIndex = { 0 };
-	bool keepData = true;
-	std::size_t collumsNumber;
-	std::ifstream csvReader;
-	std::vector<std::string> header ;
-	DataForLearn_n linesData;
-	Dataset csvDataset;
-
-
-
-};
-
+		float defaultValue = 0;
+		std::vector<int> exitIndex = { 0 };
+		bool keepEmptyValue = true;
+		bool keepData = true;
+		std::size_t collumsNumber;
+		std::ifstream csvReader;
+		std::vector<std::string> header;
+		DataForLearn_n linesData;
+		Dataset csvDataset;
+	};
+} // namespace

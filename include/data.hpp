@@ -3,33 +3,37 @@
 #include <string>
 #include <vector>
 
-struct DataForLearn_1 {
-  double enter;
-  double resultWould;
-};
 
-struct DataForLearn_2 {
-  float firstEnter;
-  float secondEnter;
-  float resultWould;
-};
+namespace Inf
+{
+	struct  DataForLearn_1 {
+		double enter;
+		double resultWould;
+	};
 
-struct DataForLearn_n {
-  std::vector<float> Enter;
-  std::vector<float> exitExpected;
+	struct DataForLearn_2 {
+		float firstEnter;
+		float secondEnter;
+		float resultWould;
+	};
 
-  double resultWould;
+	struct  DataForLearn_n {
+		std::vector<float> Enter;
+		std::vector<float> exitExpected;
 
-  void clear()
-  {
-	  Enter.clear();
-	  exitExpected.clear();
-	  resultWould = 0;
+		double resultWould;
 
-  }
+		void  clear()
+		{
+			Enter.clear();
+			exitExpected.clear();
+			resultWould = 0;
 
-};
+		}
 
-struct Dataset {
-  std::vector<DataForLearn_n> dataset;
-};
+	};
+
+	struct  Dataset {
+		std::vector<DataForLearn_n> dataset;
+	};
+}
